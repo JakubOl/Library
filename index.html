@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Library</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <main class="main">
+      <nav>
+        <h1 class="title">Library</h1>
+        <button class="add">+ Add book</button>
+      </nav>
+
+      <div class="main-content">
+        <div class="main-header">
+          <div>Author</div>
+          <div>Title</div>
+          <div>Number of Pages</div>
+          <div>Read</div>
+          <div>Delete</div>
+        </div>
+        <div class="books"></div>
+      </div>
+      <div class="book-window hidden">
+        <div class="book-details">
+          <div class="author">
+            <label for="author">Author <button class="x">X</button></label>
+            <input type="text" name="author" id="author" />
+          </div>
+          <div class="title">
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" />
+          </div>
+          <div class="pages">
+            <label for="pages">Number of pages</label>
+            <input type="number" name="pages" id="pages" />
+          </div>
+          <button class="read not-read">Not Read</button>
+          <button class="submit">OK</button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
