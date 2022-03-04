@@ -13,6 +13,7 @@ h1 {
 }
 
 .main {
+  z-index: 1;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -76,6 +77,10 @@ button:active {
 .hidden {
   opacity: 0;
   z-index: -1;
+}
+
+.books {
+  min-height: 70vh;
 }
 
 .book-details {

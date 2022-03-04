@@ -14,32 +14,32 @@ let read = false;
 let library = [];
 let localStorage;
 
-class Book {
-  constructor(author, title, pages, read) {
-    this.id = library.length + 1;
-    this.author = author;
-    this.title = title;
-    this.pages = pages;
-    this.read = read;
-  }
-  bookTemplate() {
-    let template = `
+function Book(author, title, pages, read = false) {
+  this.id = library.length + 1;
+  this.author = author;
+  this.title = title;
+  this.pages = +pages;
+  this.read = read;
+}
+
+Book.prototype.createTemplate = function () {
+  let template = `
         <div class="book" id="${this.id}">
           <div>${this.author}</div>
           <div>${this.title}</div>
           <div>${this.pages}</div>
           <button class="read ${this.read ? "" : "not-read"}" >${
-      this.read ? "Read" : "Not Read"
-    }</button>
+    this.read ? "Read" : "Not Read"
+  }</button>
           <button class="delete" id="${this.id}">Delete</button>
         </div>
         `;
-    return template;
-  }
-  toggleRead() {
-    this.read = !this.read;
-  }
-}
+  return template;
+};
+
+Book.prototype.toggleRead = function () {
+  this.read = !this.read;
+};
 
 if (window.localStorage.library) {
   localStorage = JSON.parse(window.localStorage.library);
@@ -77,7 +77,6 @@ function createBook() {
     read,
   ];
   if ([author, title, pages, read].includes("")) return;
-  console.log([author, title, pages, read]);
   library[library.length] = new Book(author, title, pages, read);
   (document.querySelector("#author").value = ""),
     (document.querySelector("#title").value = ""),
@@ -85,12 +84,13 @@ function createBook() {
     (read = false);
 }
 function updateLibrary() {
+  console.log(library);
   books.innerHTML = "";
   library.forEach((book) => {
     book.id = library.indexOf(book);
   });
   library.forEach((book) => {
-    books.innerHTML += book.bookTemplate();
+    books.innerHTML += book.createTemplate();
   });
   book = document.querySelectorAll(".book");
   bookEvent(book);
