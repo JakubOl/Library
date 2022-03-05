@@ -1,3 +1,4 @@
+`use strict`;
 const addBtn = document.querySelector(".add");
 const readBtn = document.querySelector(".read");
 const submitBtn = document.querySelector(".submit");
@@ -8,114 +9,140 @@ const newPages = document.querySelector("#pages");
 const books = document.querySelector(".books");
 const readBook = document.querySelectorAll(".readBook");
 const xButton = document.querySelector(".x");
-let book;
-let deleteBtn;
-let read = false;
-let library = [];
-let localStorage;
 
-function Book(author, title, pages, read = false) {
-  this.id = library.length + 1;
-  this.author = author;
-  this.title = title;
-  this.pages = +pages;
-  this.read = read;
-}
-
-Book.prototype.createTemplate = function () {
-  let template = `
+class Book {
+  constructor(author, title, pages, read = false, library) {
+    this.id = library.length + 1;
+    this.author = author;
+    this.title = title;
+    this.pages = +pages;
+    this.read = read;
+  }
+  createTemplate = function () {
+    let template = `
         <div class="book" id="${this.id}">
           <div>${this.author}</div>
           <div>${this.title}</div>
           <div>${this.pages}</div>
           <button class="read ${this.read ? "" : "not-read"}" >${
-    this.read ? "Read" : "Not Read"
-  }</button>
+      this.read ? "Read" : "Not Read"
+    }</button>
           <button class="delete" id="${this.id}">Delete</button>
         </div>
         `;
-  return template;
-};
-
-Book.prototype.toggleRead = function () {
-  this.read = !this.read;
-};
-
-if (window.localStorage.library) {
-  localStorage = JSON.parse(window.localStorage.library);
-  localStorage.forEach((book) => {
-    let { id, author, title, pages, read } = book;
-    library[library.length] = new Book(author, title, pages, read);
-  });
-}
-updateLibrary();
-
-readBtn.addEventListener("click", function () {
-  readBtn.classList.toggle("not-read");
-  read = !read;
-  read ? (readBtn.textContent = "Read") : (readBtn.textContent = "Not Read");
-});
-
-function toggleWindow() {
-  newBookWindow.classList.toggle("hidden");
+    return template;
+  };
+  toggleRead = function () {
+    this.read = !this.read;
+  };
 }
 
-submitBtn.addEventListener("click", function () {
-  createBook();
-  updateLibrary();
-  toggleWindow();
-});
+class Library {
+  constructor() {
+    this.book;
+    this.deleteBtn;
+    this.read = false;
+    this.library = [];
+    this.localStorage;
+  }
 
-addBtn.addEventListener("click", toggleWindow);
-xButton.addEventListener("click", toggleWindow);
+  init = function () {
+    this.checkLocalStorage();
+    this.checkIfEmpty();
+  };
 
-function createBook() {
-  [author, title, pages, read] = [
-    document.querySelector("#author").value,
-    document.querySelector("#title").value,
-    document.querySelector("#pages").value,
-    read,
-  ];
-  if ([author, title, pages, read].includes("")) return;
-  library[library.length] = new Book(author, title, pages, read);
-  (document.querySelector("#author").value = ""),
-    (document.querySelector("#title").value = ""),
-    (document.querySelector("#pages").value = ""),
-    (read = false);
-}
-function updateLibrary() {
-  console.log(library);
-  books.innerHTML = "";
-  library.forEach((book) => {
-    book.id = library.indexOf(book);
-  });
-  library.forEach((book) => {
-    books.innerHTML += book.createTemplate();
-  });
-  book = document.querySelectorAll(".book");
-  bookEvent(book);
-  window.localStorage.library = JSON.stringify(library);
-}
-
-function bookEvent(books) {
-  books.forEach((book) => {
-    book.addEventListener("click", function (e) {
-      if (e.target.classList.contains("delete")) {
-        library.splice(e.target.parentElement.id, 1);
-        updateLibrary();
-      }
-      if (e.target.classList.contains("read")) {
-        const bookId = e.target.parentElement.id;
-        library[bookId].read = !library[bookId].read;
-        updateLibrary();
-      }
+  checkLocalStorage = function () {
+    if (window.localStorage[this.library]) {
+      this.localStorage = JSON.parse(window.localStorage[this]);
+      this.localStorage.forEach((book) => {
+        let { author, title, pages, read } = book;
+        this.library[this.library.length] = new Book(
+          author,
+          title,
+          pages,
+          read,
+          this
+        );
+      });
+      this.updateLibrary();
+    }
+  };
+  checkIfEmpty = function () {
+    if (this.library.length < 1) {
+      this.library[0] = new Book("Tolkien", "Hobbit", 1, true, this);
+      this.library[1] = new Book("kook", "Star Wars", 2, false, this);
+      this.library[2] = new Book("kook", "Star Wars", 3, false, this);
+      this.library[3] = new Book("kook", "Star Wars", 4, false, this);
+      this.updateLibrary();
+    }
+  };
+  toggleWindow = function () {
+    newBookWindow.classList.toggle("hidden");
+  };
+  createBook = function () {
+    let [author, title, pages, isRead] = [
+      document.querySelector("#author").value,
+      document.querySelector("#title").value,
+      document.querySelector("#pages").value,
+      this.read,
+    ];
+    if ([author, title, pages, isRead].includes("")) return;
+    this.library[this.library.length] = new Book(
+      author,
+      title,
+      pages,
+      isRead,
+      this
+    );
+    (document.querySelector("#author").value = ""),
+      (document.querySelector("#title").value = ""),
+      (document.querySelector("#pages").value = ""),
+      (this.read = false);
+  };
+  updateLibrary = function () {
+    books.innerHTML = "";
+    this.library.forEach((book) => {
+      book.id = this.library.indexOf(book);
     });
+    this.library.forEach((book) => {
+      books.innerHTML += book.createTemplate();
+    });
+    this.book = document.querySelectorAll(".book");
+    window.localStorage[this] = JSON.stringify(this.library);
+  };
+
+  bookEvent = function (e) {
+    if (e.target.classList.contains("delete")) {
+      this.library.splice(e.target.parentElement.id, 1);
+      this.updateLibrary();
+    }
+    if (e.target.classList.contains("read")) {
+      const bookId = e.target.parentElement.id;
+      this.library[bookId].read = !this.library[bookId].read;
+      this.updateLibrary();
+    }
+  };
+}
+
+(function () {
+  const mylibrary = new Library();
+  mylibrary.init();
+  mylibrary.updateLibrary();
+  readBtn.addEventListener("click", function () {
+    readBtn.classList.toggle("not-read");
+    mylibrary.read = !mylibrary.read;
+    mylibrary.read
+      ? (readBtn.textContent = "Read")
+      : (readBtn.textContent = "Not Read");
   });
-}
-if (library.length < 1) {
-  library[0] = new Book("Tolkien", "Hobbit", 1, true);
-  library[1] = new Book("kook", "Star Wars", 2, false);
-  library[2] = new Book("kook", "Star Wars", 3, false);
-  library[3] = new Book("kook", "Star Wars", 4, false);
-  updateLibrary();
-}
+  submitBtn.addEventListener("click", function () {
+    mylibrary.createBook();
+    mylibrary.updateLibrary();
+    mylibrary.toggleWindow();
+  });
+  addBtn.addEventListener("click", mylibrary.toggleWindow);
+  xButton.addEventListener("click", mylibrary.toggleWindow);
+  books.addEventListener("click", function (e) {
+    mylibrary.bookEvent(e);
+  });
+})();
